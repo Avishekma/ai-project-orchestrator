@@ -1,4 +1,14 @@
+import logging
+
 import structlog
+
+_NAME_TO_LEVEL = {
+    "debug": logging.DEBUG,
+    "info": logging.INFO,
+    "warning": logging.WARNING,
+    "error": logging.ERROR,
+    "critical": logging.CRITICAL,
+}
 
 
 def setup_logging(log_level: str = "info") -> None:
@@ -15,7 +25,7 @@ def setup_logging(log_level: str = "info") -> None:
             else structlog.processors.JSONRenderer(),
         ],
         wrapper_class=structlog.make_filtering_bound_logger(
-            structlog.get_level_from_name(log_level)
+            _NAME_TO_LEVEL.get(log_level.lower(), logging.INFO)
         ),
         context_class=dict,
         logger_factory=structlog.PrintLoggerFactory(),
