@@ -34,9 +34,17 @@ dev = [
 target-version = "py311"
 line-length = 100
 
+[tool.hatch.build.targets.wheel]
+packages = ["orchestrator"]
+
 [tool.ruff.lint]
 select = ["E", "F", "I", "N", "W", "UP", "S", "B", "A", "SIM", "TCH"]
-ignore = ["S104"]  # binding to 0.0.0.0 is intentional for containers
+ignore = [
+    "S104",  # binding to 0.0.0.0 is intentional for containers
+    "S603",  # subprocess calls with fixed args are safe
+    "S607",  # partial executable paths (git) are acceptable
+    "S108",  # /tmp usage is intentional, overridden via env var
+]
 
 [tool.pytest.ini_options]
 asyncio_mode = "auto"

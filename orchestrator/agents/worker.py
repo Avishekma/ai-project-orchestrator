@@ -10,7 +10,6 @@ This module is called as a background task from the API. It:
 from __future__ import annotations
 
 import os
-import shutil
 import subprocess
 
 import structlog
@@ -66,7 +65,13 @@ async def run_project(
         options = ClaudeAgentOptions(
             cwd=workspace,
             allowed_tools=[
-                "Read", "Write", "Edit", "Bash", "Glob", "Grep", "Agent",
+                "Read",
+                "Write",
+                "Edit",
+                "Bash",
+                "Glob",
+                "Grep",
+                "Agent",
             ],
             permission_mode="bypassPermissions",
             max_turns=settings.max_agent_turns,
@@ -117,9 +122,7 @@ async def run_project(
                         final_phase = ProjectPhase.FAILED
                         final_msg = "Agent hit max turns limit."
 
-                    await state_manager.update_phase(
-                        project_id, final_phase, final_msg
-                    )
+                    await state_manager.update_phase(project_id, final_phase, final_msg)
 
     except Exception as e:
         log.exception("worker_failed", project_id=project_id)

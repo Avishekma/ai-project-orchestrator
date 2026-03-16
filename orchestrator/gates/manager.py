@@ -12,7 +12,7 @@ a web dashboard, Slack bot, CLI, or any HTTP client.
 from __future__ import annotations
 
 import json
-from datetime import datetime, timezone
+from datetime import UTC, datetime
 
 import redis.asyncio as aioredis
 import structlog
@@ -103,9 +103,7 @@ class GateManager:
         elapsed = 0
 
         while elapsed < deadline:
-            result = await self.redis.blpop(
-                channel, timeout=settings.gate_poll_interval_seconds
-            )
+            result = await self.redis.blpop(channel, timeout=settings.gate_poll_interval_seconds)
             if result is not None:
                 _, raw = result
                 decision_data = json.loads(raw)
@@ -115,7 +113,7 @@ class GateManager:
                 gate.status = decision.decision
                 gate.feedback = decision.feedback
                 gate.decided_by = decision.decided_by
-                gate.decided_at = datetime.now(timezone.utc)
+                gate.decided_at = datetime.now(UTC)
                 await self.redis.hset(
                     f"project:{project_id}:gates",
                     gate.gate_id,
@@ -153,9 +151,7 @@ class GateManager:
 
     # ── Called by the API when a human makes a decision ──
 
-    async def submit_decision(
-        self, gate_id: str, decision: GateDecision
-    ) -> None:
+    async def submit_decision(self, gate_id: str, decision: GateDecision) -> None:
         """Unblock the agent by pushing the decision onto the gate's channel."""
         channel = f"gate:{gate_id}:decision"
         await self.redis.lpush(channel, decision.model_dump_json())

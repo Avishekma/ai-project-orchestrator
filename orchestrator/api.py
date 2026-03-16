@@ -141,9 +141,7 @@ async def get_gate(project_id: str, gate_id: str):
 
 
 @app.post("/projects/{project_id}/gates/{gate_id}")
-async def submit_gate_decision(
-    project_id: str, gate_id: str, decision: GateDecision
-):
+async def submit_gate_decision(project_id: str, gate_id: str, decision: GateDecision):
     """Submit a decision for a pending gate. Unblocks the waiting agent."""
     gate = await gate_manager.get_gate(project_id, gate_id)
     if gate is None:

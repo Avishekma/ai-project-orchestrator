@@ -45,9 +45,8 @@ def create_jira_tools(project_id: str) -> list:
                 ticket_id = f"{project_key}-{100 + i}"
                 created.append(f"{ticket_id}: {story.get('summary', 'Untitled')}")
             epic_id = f"{project_key}-100"
-            result = (
-                f"[MOCK] Created epic {epic_id}: {epic_summary}\n"
-                f"Stories:\n" + "\n".join(f"  - {c}" for c in created)
+            result = f"[MOCK] Created epic {epic_id}: {epic_summary}\nStories:\n" + "\n".join(
+                f"  - {c}" for c in created
             )
             return _ok(result)
 
@@ -104,9 +103,8 @@ def create_jira_tools(project_id: str) -> list:
                 story_key = story_resp.json()["key"]
                 created.append(f"{story_key}: {story.get('summary', '')}")
 
-            result = (
-                f"Created epic {epic_key}: {epic_summary}\n"
-                f"Stories:\n" + "\n".join(f"  - {c}" for c in created)
+            result = f"Created epic {epic_key}: {epic_summary}\nStories:\n" + "\n".join(
+                f"  - {c}" for c in created
             )
             log.info("jira_epic_created", epic_key=epic_key, story_count=len(created))
             return _ok(result)

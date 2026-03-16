@@ -6,8 +6,7 @@ All state is persisted in Redis so it survives API restarts.
 
 from __future__ import annotations
 
-import json
-from datetime import datetime, timezone
+from datetime import UTC, datetime
 
 import redis.asyncio as aioredis
 import structlog
@@ -44,7 +43,7 @@ class ProjectStateManager:
         return self._redis
 
     async def create_project(self, project_id: str) -> ProjectStatus:
-        now = datetime.now(timezone.utc)
+        now = datetime.now(UTC)
         status = ProjectStatus(
             project_id=project_id,
             phase=ProjectPhase.INITIALIZING,
@@ -73,7 +72,7 @@ class ProjectStateManager:
 
         status.phase = phase
         status.message = message
-        status.updated_at = datetime.now(timezone.utc)
+        status.updated_at = datetime.now(UTC)
 
         for key, value in kwargs.items():
             if hasattr(status, key):

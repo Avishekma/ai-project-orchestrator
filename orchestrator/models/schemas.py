@@ -1,16 +1,15 @@
 from __future__ import annotations
 
 import uuid
-from datetime import datetime, timezone
-from enum import Enum
+from datetime import UTC, datetime
+from enum import StrEnum
 
-from pydantic import BaseModel, Field
-
+from pydantic import BaseModel, Field  # noqa: I001
 
 # --- Project ---
 
 
-class ProjectPhase(str, Enum):
+class ProjectPhase(StrEnum):
     INITIALIZING = "initializing"
     PLANNING = "planning"
     AWAITING_PLAN_REVIEW = "awaiting_plan_review"
@@ -28,7 +27,9 @@ class ProjectCreate(BaseModel):
 
     document: str = Field(..., description="The project spec — markdown text, URL, or file path")
     repo_url: str = Field(..., description="Git clone URL for the target repo")
-    jira_project_key: str = Field("", description="Jira project key (e.g. PROJ). Empty to skip Jira.")
+    jira_project_key: str = Field(
+        "", description="Jira project key (e.g. PROJ). Empty to skip Jira."
+    )
     base_branch: str = Field("main", description="Base branch to create feature branches from")
     branch_prefix: str = Field("feature", description="Prefix for feature branches")
 
@@ -50,14 +51,14 @@ class ProjectStatus(BaseModel):
 # --- Gates (human-in-the-loop) ---
 
 
-class GateType(str, Enum):
+class GateType(StrEnum):
     PLAN_REVIEW = "plan_review"
     PR_REVIEW = "pr_review"
     DEPLOY_APPROVAL = "deploy_approval"
     GENERIC_APPROVAL = "generic_approval"
 
 
-class GateStatus(str, Enum):
+class GateStatus(StrEnum):
     PENDING = "pending"
     APPROVED = "approved"
     REJECTED = "rejected"
@@ -73,7 +74,7 @@ class Gate(BaseModel):
     summary: str
     details: dict = Field(default_factory=dict)
     status: GateStatus = GateStatus.PENDING
-    created_at: datetime = Field(default_factory=lambda: datetime.now(timezone.utc))
+    created_at: datetime = Field(default_factory=lambda: datetime.now(UTC))
     decided_at: datetime | None = None
     decided_by: str | None = None
     feedback: str = ""
@@ -92,7 +93,7 @@ class GateDecision(BaseModel):
 # --- Events (SSE) ---
 
 
-class EventType(str, Enum):
+class EventType(StrEnum):
     STATUS_UPDATE = "status_update"
     GATE_REQUESTED = "gate_requested"
     GATE_DECIDED = "gate_decided"
@@ -106,5 +107,5 @@ class ProjectEvent(BaseModel):
 
     event_type: EventType
     project_id: str
-    timestamp: datetime = Field(default_factory=lambda: datetime.now(timezone.utc))
+    timestamp: datetime = Field(default_factory=lambda: datetime.now(UTC))
     data: dict = Field(default_factory=dict)
